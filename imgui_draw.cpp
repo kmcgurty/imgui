@@ -3298,7 +3298,7 @@ const ImFontGlyph* ImFont::FindGlyphNoFallback(ImWchar c) const
     return &Glyphs.Data[i];
 }
 
-const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width) const
+const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const char* text_end, float wrap_width, float line_start = 0) const // CHANGE: New line_start parameter
 {
     // Simple word-wrapping for English, not full-featured. Please submit failing cases!
     // FIXME: Much possible improvements (don't cut things like "word !", "word!!!" but cut within "word,,,,", more sensible support for punctuations, support for Unicode punctuations, etc.)
@@ -3315,13 +3315,13 @@ const char* ImFont::CalcWordWrapPositionA(float scale, const char* text, const c
     // Cut words that cannot possibly fit within one line.
     // e.g.: "The tropical fish" with ~5 characters worth of width --> "The tr" "opical" "fish"
 
-    float line_width = 0.0f;
+    float line_width = line_start / scale; // CHANGE: This used to start at 0
     float word_width = 0.0f;
     float blank_width = 0.0f;
     wrap_width /= scale; // We work with unscaled widths to avoid scaling every characters
 
     const char* word_end = text;
-    const char* prev_word_end = NULL;
+    const char* prev_word_end = line_start > 0.0f ? word_end : NULL;;
     bool inside_word = true;
 
     const char* s = text;
